@@ -14,4 +14,5 @@ private_subnet_cidr_eu_central_1a = "$PRIVATE_SUBNET1"
 private_subnet_cidr_eu_central_1b = "$PRIVATE_SUBNET2"
 public_subnet_cidr_eu_central_1a = "$PUBLIC_SUBNET1"
 public_subnet_cidr_eu_central_1b = "$PUBLIC_SUBNET2"
+capacity_type = "$CAPACITY_TYPE"
 EOF
