@@ -1,0 +1,14 @@
+variable "cluster_id" {}
+variable "vpc_name" {}
+variable "secret_key" {}
+variable "access_key" {}
+variable "region" {}
+variable "availability_zone1" {}
+variable "availability_zone2" {}
+variable "cidr_block" {}
+variable "private_subnet_cidr_eu_central_1a" {}
+variable "private_subnet_cidr_eu_central_1b" {}
+variable "public_subnet_cidr_eu_central_1a" {}
+variable "public_subnet_cidr_eu_central_1b" {}
+variable "account_id" {}
+variable "capacity_type" {}

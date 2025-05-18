@@ -1,0 +1,8 @@
+# Terraform directory
+0-eks/.terraform.*
+0-eks/.terraform
+
+###Some local files use for debugging##
+*.md
+terraform.tfstate
+0-eks/terraform.tfvars
