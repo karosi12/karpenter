@@ -18,12 +18,13 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       REGION: ${{ secrets.REGION }}
       AZ1: ${{ secrets.AZ1 }}
-      AZ2: ${{ secrets.SG_NAME }}
+      AZ2: ${{ secrets.AZ2 }}
       CIDR_BLOCK: ${{ secrets.CIDR_BLOCK }}
       ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}
       PRIVATE_SUBNET1: ${{ secrets.PRIVATE_SUBNET1 }}
       PRIVATE_SUBNET2: ${{ secrets.PRIVATE_SUBNET2 }}
       PUBLIC_SUBNET1: ${{ vars.PUBLIC_SUBNET1 }}
+      PUBLIC_SUBNET2: ${{ vars.PUBLIC_SUBNET2 }}
       CAPACITY_TYPE: ${{ vars.CAPACITY_TYPE }}
 
     steps:
