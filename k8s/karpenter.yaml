@@ -30,10 +30,10 @@
     name: default
   spec:
     amiFamily: AL2
-    role: KarpenterNodeRole-opfleet 
+    role: KarpenterNodeRole-opsfleet 
     subnetSelectorTerms:
       - tags:
-        karpenter.sh/discovery: opfleet 
+        karpenter.sh/discovery: opsfleet 
     securityGroupSelectorTerms:
       - tags:
-        karpenter.sh/discovery: opfleet 
+        karpenter.sh/discovery: opsfleet 
