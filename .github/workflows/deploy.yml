@@ -11,7 +11,8 @@ jobs:
     name: Run Terraform 0-eks
     runs-on: ubuntu-latest
     outputs:
-      KUBECONFIG: ${{ steps.get_output.outputs.KUBECONFIG }}
+      kubeconfig: ${{ steps.get_output.outputs.kubeconfig }}
+      # KUBECONFIG: ${{ steps.get_output.outputs.KUBECONFIG }}
     env:
       CLUSTER_ID: ${{ secrets.CLUSTER_ID }}
       VPC_NAME: ${{ secrets.VPC_NAME }}
@@ -64,7 +65,8 @@ jobs:
           # echo "KUBECONFIG_COMMAND=$(terraform output -raw kubeconfig)" >> $GITHUB_ENV
           mkdir -p ~/.kube
           terraform output -raw kubeconfig > ~/.kube/config
-          export KUBECONFIG=~/.kube/config
+          echo "kubeconfig=$(cat ~/.kube/config)" >> $GITHUB_ENV
+          # export KUBECONFIG=~/.kube/config
         working-directory: 0-eks
 
       # - name: Generate Kubeconfig File
@@ -80,7 +82,7 @@ jobs:
 
     
     env:
-      KUBECONFIG: ${{ needs.eks-0.outputs.KUBECONFIG }}
+      KUBECONFIG: ${{ needs.eks-0.outputs.kubeconfig }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
