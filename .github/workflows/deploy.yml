@@ -85,38 +85,44 @@ jobs:
 
     env:
       KUBECONFIG: ${{ needs.eks-0.outputs.kubeconfig }}
-      CLUSTER_ID: ${{ secrets.CLUSTER_ID }}
+      CLUSTER_NAME: ${{ secrets.CLUSTER_ID }}
       VPC_NAME: ${{ secrets.VPC_NAME }}
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      REGION: ${{ secrets.REGION }}
+      AWS_REGION: ${{ secrets.REGION }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.REGION }}
 
       - name: Set up Kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: "v1.33.1"
 
-      - name: Download Kubeconfig Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: kubeconfig
-          path: ~/.kube/
+      # - name: Download Kubeconfig Artifact
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: kubeconfig
+      #     path: ~/.kube/
 
-      - name: Configure Kubeconfig
+      # - name: Configure Kubeconfig
+      #   run: |
+      #     echo "Setting up kubeconfig..."
+      #     export KUBECONFIG=~/.kube/config
+      #     kubectl config view
+      - name: Update kubeconfig for EKS cluster
         run: |
-          echo "Setting up kubeconfig..."
-          export KUBECONFIG=~/.kube/config
-          kubectl config view
-
+          aws eks update-kubeconfig --region "$AWS_REGION" --name "$CLUSTER_NAME"
       - name: Run Kubectl Command
         run: |
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_DEFAULT_REGION=${{ secrets.REGION }}
           kubectl apply -f karpenter.yaml
         working-directory: k8s
 
