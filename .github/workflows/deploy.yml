@@ -65,9 +65,12 @@ jobs:
           # echo "KUBECONFIG_COMMAND=$(terraform output -raw kubeconfig)" >> $GITHUB_ENV
           mkdir -p ~/.kube
           terraform output -raw kubeconfig > ~/.kube/config
-          echo "kubeconfig=$(cat ~/.kube/config)" >> $GITHUB_ENV
-          # export KUBECONFIG=~/.kube/config
         working-directory: 0-eks
+      - name: Store Kubeconfig as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: kubeconfig
+          path: ~/.kube/config
 
       # - name: Generate Kubeconfig File
       #   run: |
@@ -80,7 +83,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: eks-0
 
-    
     env:
       KUBECONFIG: ${{ needs.eks-0.outputs.kubeconfig }}
     steps:
@@ -92,10 +94,15 @@ jobs:
         with:
           version: "v1.33.1"
 
+      - name: Download Kubeconfig Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: kubeconfig
+          path: ~/.kube/
+
       - name: Configure Kubeconfig
         run: |
           echo "Setting up kubeconfig..."
-          echo $KUBECONFIG
           export KUBECONFIG=~/.kube/config
           kubectl config view
 
