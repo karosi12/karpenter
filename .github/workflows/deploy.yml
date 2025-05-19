@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set execution permissions
         working-directory: 0-eks
@@ -67,7 +67,7 @@ jobs:
           terraform output -raw kubeconfig > ~/.kube/config
         working-directory: 0-eks
       - name: Store Kubeconfig as Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: kubeconfig
           path: ~/.kube/config
@@ -87,7 +87,7 @@ jobs:
       KUBECONFIG: ${{ needs.eks-0.outputs.kubeconfig }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Kubectl
         uses: azure/setup-kubectl@v3
@@ -95,7 +95,7 @@ jobs:
           version: "v1.33.1"
 
       - name: Download Kubeconfig Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: kubeconfig
           path: ~/.kube/
