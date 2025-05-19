@@ -57,11 +57,11 @@ jobs:
       - name: Apply Terraform deployment
         run: terraform apply -auto-approve tfplan
         working-directory: 0-eks
-  
-      - name: Retrieve Terraform output
+
+      - name: Retrieve Terraform output (Kubeconfig)
         id: get_output
         run: |
-          echo "KUBECONFIG=$(terraform output -raw kubeconfig)" >> $GITHUB_OUTPUT
+          echo "KUBECONFIG=$(terraform output -raw kubeconfig)" >> $GITHUB_ENV
         working-directory: 0-eks
 
   kubectl-command:
