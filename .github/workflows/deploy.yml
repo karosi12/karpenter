@@ -61,14 +61,17 @@ jobs:
       - name: Retrieve Terraform output (Kubeconfig Command)
         id: get_output
         run: |
-          echo "KUBECONFIG_COMMAND=$(terraform output -raw kubeconfig)" >> $GITHUB_ENV
+          # echo "KUBECONFIG_COMMAND=$(terraform output -raw kubeconfig)" >> $GITHUB_ENV
+          mkdir -p ~/.kube
+          terraform output -raw kubeconfig > ~/.kube/config
+          export KUBECONFIG=~/.kube/config
         working-directory: 0-eks
 
-      - name: Generate Kubeconfig File
-        run: |
-          mkdir -p ~/.kube
-          $KUBECONFIG_COMMAND > ~/.kube/config
-          export KUBECONFIG=~/.kube/config
+      # - name: Generate Kubeconfig File
+      #   run: |
+      #     mkdir -p ~/.kube
+      #     $KUBECONFIG_COMMAND > ~/.kube/config
+      #     export KUBECONFIG=~/.kube/config
 
   kubectl-command:
     name: Run kubectl manifest file
@@ -76,8 +79,8 @@ jobs:
     needs: eks-0
 
     
-    env:
-      KUBECONFIG: ${{ needs.eks-0.outputs.KUBECONFIG }}
+    # env:
+    #   KUBECONFIG: ${{ needs.eks-0.outputs.KUBECONFIG }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -89,8 +92,10 @@ jobs:
 
       - name: Configure Kubeconfig
         run: |
-          echo "$KUBECONFIG" > kubeconfig.yaml
-          export KUBECONFIG=kubeconfig.yaml
+          echo "Setting up kubeconfig..."
+          echo "$KUBECONFIG"
+          export KUBECONFIG=~/.kube/config
+          kubectl config view
 
       - name: Run Kubectl Command
         run: kubectl apply -f karpenter.yaml
