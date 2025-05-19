@@ -61,7 +61,7 @@ jobs:
       - name: Retrieve Terraform output (Kubeconfig Command)
         id: get_output
         run: |
-          echo "KUBECONFIG_COMMAND=$(terraform output -raw kubeconfig_command)" >> $GITHUB_ENV
+          echo "KUBECONFIG_COMMAND=$(terraform output -raw kubeconfig)" >> $GITHUB_ENV
         working-directory: 0-eks
 
       - name: Generate Kubeconfig File
