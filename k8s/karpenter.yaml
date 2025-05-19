@@ -33,7 +33,7 @@
     role: KarpenterNodeRole-opsfleet 
     subnetSelectorTerms:
       - tags:
-        karpenter.sh/discovery: opsfleet 
+        karpenter.sh/discovery: "opsfleet" 
     securityGroupSelectorTerms:
       - tags:
-        karpenter.sh/discovery: opsfleet 
+        karpenter.sh/discovery: "opsfleet" 
