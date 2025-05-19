@@ -85,6 +85,12 @@ jobs:
 
     env:
       KUBECONFIG: ${{ needs.eks-0.outputs.kubeconfig }}
+      CLUSTER_ID: ${{ secrets.CLUSTER_ID }}
+      VPC_NAME: ${{ secrets.VPC_NAME }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      REGION: ${{ secrets.REGION }}
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -105,6 +111,9 @@ jobs:
           echo "Setting up kubeconfig..."
           export KUBECONFIG=~/.kube/config
           kubectl config view
+          
+      - name: Verify Kubernetes Connection
+        run: kubectl cluster-info
 
       - name: Run Kubectl Command
         run: kubectl apply -f karpenter.yaml
