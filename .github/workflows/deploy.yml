@@ -66,17 +66,6 @@ jobs:
           mkdir -p ~/.kube
           terraform output -raw kubeconfig > ~/.kube/config
         working-directory: 0-eks
-      - name: Store Kubeconfig as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: kubeconfig
-          path: ~/.kube/config
-
-      # - name: Generate Kubeconfig File
-      #   run: |
-      #     mkdir -p ~/.kube
-      #     $KUBECONFIG_COMMAND > ~/.kube/config
-      #     export KUBECONFIG=~/.kube/config
 
   kubectl-command:
     name: Run kubectl manifest file
@@ -107,17 +96,6 @@ jobs:
         with:
           version: "v1.33.1"
 
-      # - name: Download Kubeconfig Artifact
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: kubeconfig
-      #     path: ~/.kube/
-
-      # - name: Configure Kubeconfig
-      #   run: |
-      #     echo "Setting up kubeconfig..."
-      #     export KUBECONFIG=~/.kube/config
-      #     kubectl config view
       - name: Update kubeconfig for EKS cluster
         run: |
           aws eks update-kubeconfig --region "$AWS_REGION" --name "$CLUSTER_NAME"
