@@ -10,7 +10,8 @@ jobs:
   eks-0:
     name: Run Terraform 0-eks
     runs-on: ubuntu-latest
-      
+    outputs:
+      KUBECONFIG: ${{ steps.get_output.outputs.KUBECONFIG }}
     env:
       CLUSTER_ID: ${{ secrets.CLUSTER_ID }}
       VPC_NAME: ${{ secrets.VPC_NAME }}
@@ -33,7 +34,7 @@ jobs:
 
       - name: Set execution permissions
         working-directory: 0-eks
-        run: ls && chmod +x generate_tfvars.sh
+        run: chmod +x generate_tfvars.sh
 
       - name: Generate terraform.tfvars
         working-directory: 0-eks
@@ -56,3 +57,35 @@ jobs:
       - name: Apply Terraform deployment
         run: terraform apply -auto-approve tfplan
         working-directory: 0-eks
+  
+      - name: Retrieve Terraform output
+        id: get_output
+        run: |
+          echo "KUBECONFIG=$(terraform output -raw kubeconfig)" >> $GITHUB_OUTPUT
+        working-directory: 0-eks
+
+  kubectl-command:
+    name: Run kubectl manifest file
+    runs-on: ubuntu-latest
+    needs: eks-0
+
+    
+    env:
+      KUBECONFIG: ${{ needs.eks-0.outputs.KUBECONFIG }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "v1.33.1"
+
+      - name: Configure Kubeconfig
+        run: |
+          echo "$KUBECONFIG" > kubeconfig.yaml
+          export KUBECONFIG=kubeconfig.yaml
+
+      - name: Run Kubectl Command
+        run: kubectl apply -f karpenter.yaml
+        working-directory: k8s
