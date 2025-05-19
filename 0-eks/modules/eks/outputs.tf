@@ -10,9 +10,6 @@ output "oidc_url" {
   value = aws_iam_openid_connect_provider.eks.url
 }
 
-# output "kubeconfig" {
-#   value = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.opsfleet.name}"
-# }
 
 output "kubeconfig" {
   value = <<EOT

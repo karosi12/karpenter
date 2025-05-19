@@ -117,36 +117,11 @@ resource "null_resource" "karpenter_install" {
       #!/bin/bash
       set -e
 
-      # Wait for EKS cluster to be ACTIVE
-      # while true; do
-      #   STATUS=$(aws eks describe-cluster --name ${var.cluster_name} --region ${var.region} --query "cluster.status" --output text)
-      #   if [ "$STATUS" == "ACTIVE" ]; then
-      #     echo "EKS cluster is active!"
-      #     break
-      #   fi
-      #   echo "Waiting for EKS cluster to become active..."
-      #   sleep 30
-      # done
-
       # Update kubeconfig to ensure kubectl/helm can reach the cluster
       aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
 
-      # Wait for at least one Ready node
-      # while true; do
-      #   NODE_STATUS=$(kubectl get nodes --no-headers | awk '{print $2}')
-      #   if [ "$NODE_STATUS" == "Ready" ]; then
-      #     echo "Kubernetes node is Ready!"
-      #     break
-      #   fi
-      #   echo "Waiting for Kubernetes node to be Ready..."
-      #   sleep 20
-      # done
-
       # Authenticate with public ECR
       aws ecr-public get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin public.ecr.aws
-
-      # Optional: logout stale sessions
-      # helm registry logout public.ecr.aws
 
       # Install Karpenter CRDs
       helm upgrade --install karpenter-crd oci://public.ecr.aws/karpenter/karpenter-crd --version 1.4.0 --namespace karpenter --create-namespace
@@ -161,4 +136,3 @@ resource "null_resource" "karpenter_install" {
     EOT
   }
 }
-
