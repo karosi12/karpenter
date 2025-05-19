@@ -66,6 +66,7 @@ jobs:
 
       - name: Generate Kubeconfig File
         run: |
+          mkdir -p ~/.kube
           $KUBECONFIG_COMMAND > ~/.kube/config
           export KUBECONFIG=~/.kube/config
 
