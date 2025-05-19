@@ -79,8 +79,8 @@ jobs:
     needs: eks-0
 
     
-    # env:
-    #   KUBECONFIG: ${{ needs.eks-0.outputs.KUBECONFIG }}
+    env:
+      KUBECONFIG: ${{ needs.eks-0.outputs.KUBECONFIG }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -93,7 +93,7 @@ jobs:
       - name: Configure Kubeconfig
         run: |
           echo "Setting up kubeconfig..."
-          echo "$KUBECONFIG"
+          echo $KUBECONFIG
           export KUBECONFIG=~/.kube/config
           kubectl config view
 
