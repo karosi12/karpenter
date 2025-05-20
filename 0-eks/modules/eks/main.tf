@@ -117,36 +117,11 @@ resource "null_resource" "karpenter_install" {
       #!/bin/bash
       set -e
 
-      # Wait for EKS cluster to be ACTIVE
-      while true; do
-        STATUS=$(aws eks describe-cluster --name ${var.cluster_name} --region ${var.region} --query "cluster.status" --output text)
-        if [ "$STATUS" == "ACTIVE" ]; then
-          echo "EKS cluster is active!"
-          break
-        fi
-        echo "Waiting for EKS cluster to become active..."
-        sleep 30
-      done
-
       # Update kubeconfig to ensure kubectl/helm can reach the cluster
       aws eks update-kubeconfig --name ${var.cluster_name} --region ${var.region}
 
-      # Wait for at least one Ready node
-      while true; do
-        NODE_STATUS=$(kubectl get nodes --no-headers | awk '{print $2}')
-        if [ "$NODE_STATUS" == "Ready" ]; then
-          echo "Kubernetes node is Ready!"
-          break
-        fi
-        echo "Waiting for Kubernetes node to be Ready..."
-        sleep 20
-      done
-
       # Authenticate with public ECR
       aws ecr-public get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin public.ecr.aws
-
-      # Optional: logout stale sessions
-      # helm registry logout public.ecr.aws
 
       # Install Karpenter CRDs
       helm upgrade --install karpenter-crd oci://public.ecr.aws/karpenter/karpenter-crd --version 1.4.0 --namespace karpenter --create-namespace
@@ -160,50 +135,4 @@ resource "null_resource" "karpenter_install" {
       --set settings.aws.defaultInstanceProfile=KarpenterInstanceProfile
     EOT
   }
-}
-
-
-resource "kubectl_manifest" "karpenter_nodepool" {
-  depends_on = [null_resource.karpenter_install]
-  yaml_body  = <<-YAML
-  apiVersion: karpenter.sh/v1
-  kind: NodePool
-  metadata:
-    name: default
-  spec:
-    template:
-      spec:
-        nodeClassRef:
-          group: karpenter.k8s.aws
-          name: default
-          kind: EC2NodeClass
-        expireAfter: 720h
-        requirements:
-          - key: "karpenter.sh/capacity-type"
-            operator: In
-            values: ["spot"]
-          - key: "kubernetes.io/arch"
-            operator: In
-            values: ["arm64", "amd64"]
-    limits:
-      # resources:
-      cpu: "1000"
-    disruption:
-      consolidationPolicy: WhenEmptyOrUnderutilized
-      consolidateAfter: 1m
-  ---
-  apiVersion: karpenter.k8s.aws/v1
-  kind: EC2NodeClass
-  metadata:
-    name: default
-  spec:
-    amiFamily: AL2
-    role: KarpenterNodeRole-${var.cluster_name} # Replace with actual IAM role name
-    subnetSelectorTerms:
-      - tags:
-        karpenter.sh/discovery: ${var.cluster_name}  # Replace accordingly
-    securityGroupSelectorTerms:
-      - tags:
-        karpenter.sh/discovery: ${var.cluster_name}
-  YAML
 }
