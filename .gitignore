@@ -4,5 +4,6 @@
 
 ###Some local files use for debugging##
 *.md
+!Readme.md
 terraform.tfstate
 0-eks/terraform.tfvars
